@@ -90,7 +90,7 @@ parse_template(File) ->
     case file:read_file(File1) of
         {ok, B} -> parse_template1(B);
         _ ->
-            ?LOG("Error reading file: ~s~n", [File1]),
+            ?LOG2("Error reading file: ~s~n", [File1]),
             throw({template_not_found, File1})
     end.
 
@@ -100,7 +100,7 @@ parse_template1(B) ->
             Tag1 = string:strip(wf:to_list(Tag)),
             to_module_callback(Tag1)
         catch _ : _ ->
-            ?LOG("Invalid template tag: ~s~n", [Tag])
+            ?LOG2("Invalid template tag: ~s~n", [Tag])
         end
     end,
     parse(B, F).

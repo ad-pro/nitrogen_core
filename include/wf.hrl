@@ -115,11 +115,21 @@
 }).
 
 %%% LOGGING %%%
--ifndef(debug_print).
--define(debug_print, true).
--define(PRINT(Var), error_logger:info_msg("DEBUG: ~p:~p~n~p~n  ~p~n", [?MODULE, ?LINE, ??Var, Var])).
--define(LOG(Msg, Args), error_logger:info_msg(Msg, Args)).
--define(DEBUG, error_logger:info_msg("DEBUG: ~p:~p~n", [?MODULE, ?LINE])).
+-ifndef (LOGGER_HRL).
+    -ifndef(debug_print).
+       -define(debug_print, true).
+        -define(PRINT(Var), error_logger:info_msg("DEBUG: ~p:~p~n~p~n  ~p~n", [?MODULE, ?LINE, ??Var, Var])).
+        -define(LOG2(Msg, Args), error_logger:info_msg(Msg, Args)).
+        -define(DEBUG, error_logger:info_msg("DEBUG: ~p:~p~n", [?MODULE, ?LINE])).
+    -endif.
+-else.
+    -ifndef(debug_print).
+        -define(debug_print, true).
+        -define(PRINT(Var), ?LOG_INFO("DEBUG: ~p:~p~n~p~n  ~p~n", [?MODULE, ?LINE, ??Var, Var])).
+        -define(LOG2(Msg, Args), ?LOG_INFO(Msg, Args)).
+        -define(DEBUG, ?LOG_DEBUG("DEBUG: ~p:~p~n", [?MODULE, ?LINE])).
+    -endif.
+
 -endif.
 
 %%% GUARDS %%%

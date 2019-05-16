@@ -21,7 +21,7 @@ transform_element(Record) ->
         {ok, B} -> 
             wf:html_encode(B, Encode);
         _ -> 
-            ?LOG("Error reading file: ~s~n", [FilePath]),
+            ?LOG2("Error reading file: ~s~n", [FilePath]),
             wf:f("File not found: ~s.", [FilePath])
     end,
 
