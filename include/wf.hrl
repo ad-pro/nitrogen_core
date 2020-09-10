@@ -63,6 +63,9 @@
                                 | {stream, Size :: integer(), fun()}
                                 | {sendfile, integer(), Size :: integer(), Path :: any()}.
 -type context_type()        :: first_request | postback_request | static_file | postback_websocket | undefined.
+-type mermaid_code()        :: binary() | string() | iolist().
+-type mermaid_diagram()     :: flowchart | sequence | gantt.
+-type mermaid_diagram_options(Diagram)      :: {Diagram, proplist()}.
 %%% CONTEXT %%%
 
 % Page Request Information.
@@ -287,6 +290,12 @@
         text=""                 :: text(),
         html_encode=true        :: html_encode()
     }).
+-record(delay_body, {?ELEMENT_BASE(element_delay_body), 
+        delegate                :: module(),
+        tag=undefined           :: term(),
+        placeholder             :: body(),
+        delay=0                 :: integer()  %% milliseconds to wait to populate
+    }).
 -record(button, {?ELEMENT_BASE(element_button),
         text=""                 :: text(),
         body=""                 :: body(),
@@ -320,7 +329,7 @@
         delegate                :: module(),
         html_name               :: html_name(),
         type=text               :: string() | atom(),
-	autocomplete="off"      :: string() | atom()
+        autocomplete="off"      :: string() | atom()
     }).
 -record(datepicker_textbox, {?ELEMENT_BASE(element_datepicker_textbox),
         text=""                 :: text(),
@@ -337,6 +346,16 @@
         validators=[]           :: validators(),
         options = [{dateFormat, "yy-mm-dd"}]    :: proplist()
     }).
+-record(date_dropdown, {?ELEMENT_BASE(element_date_dropdown),
+        value=""                :: text() | erlang:date() | {erlang:date(),erlang:time()},
+        format=iso              :: ymd | iso | mdy | usa | dmy,
+        min_year=undefined      :: undefined | integer(),
+        max_year=undefined      :: undefined | integer(),
+        month_names=true        :: boolean(),
+        month_fun={element_date_dropdown, months} :: {module(), atom()} | fun(),
+        wrapperid=undefined     :: id(),
+        allow_blank=false	:: boolean()
+}).
 -record(textbox_autocomplete, {?ELEMENT_BASE(element_textbox_autocomplete),
         tag                     :: term(),
         text=""                 :: text(),
@@ -437,6 +456,7 @@
         text=""                 :: text(),
         html_encode=true        :: html_encode(),
         value                   :: text(),
+        label_class             :: class() | [class()],
         next                    :: id(),
         name                    :: html_name(),
         checked=false           :: boolean(),
@@ -893,6 +913,12 @@
         size=200                :: integer()
     }).
 
+-record(mermaid, {?ELEMENT_BASE(element_mermaid),
+        code=[]                 :: mermaid_code(),
+        options=[]              :: proplist(),
+        diagram_options=undefined      :: undefined | mermaid_diagram_options(mermaid_diagram())
+    }).
+
 %%% Actions %%%
 -define(AV_BASE(Module,Type),
    is_action=Type               :: is_action | is_validator,
@@ -961,6 +987,18 @@
         url=""                  :: url(),
         login=false             :: boolean() | url()
     }).
+-record(open_window, {?ACTION_BASE(action_open_window),
+        url=""                  :: url(),
+        height                  :: integer() | undefined,
+        width                   :: integer() | undefined,
+        left                    :: integer() | undefined,
+        top                     :: integer() | undefined,
+        menubar=true            :: boolean(),
+        statusbar=true          :: boolean(),
+        titlebar=true           :: boolean(),
+        name='_blank'           :: '_blank' | '_parent' | '_self' | '_top' | text(),
+        options=[]
+    }).
 -record(event, {?ACTION_BASE(action_event),
         type=default            :: atom(),
         keycode=undefined       :: integer() | undefined,
@@ -1008,6 +1046,19 @@
         script                  :: text()
     }).
 -record(disable_selection, {?ACTION_BASE(action_disable_selection)}).
+-record(disable_option, {?ACTION_BASE(action_toggle_option),
+        value                   :: atom() | string() | binary() | integer()
+}).
+-record(enable_option, {?ACTION_BASE(action_toggle_option),
+        value                   :: atom() | string() | binary() | integer()
+}).
+-record(add_option, {?ACTION_BASE(action_add_option),
+        option                  :: #option{} | short_option(),
+        location=bottom         :: top | bottom
+}).
+-record(remove_option, {?ACTION_BASE(action_remove_option),
+        value                   :: atom() | string() | binary() | integer()
+}).
 -record(jquery_effect, {?ACTION_BASE(action_jquery_effect),
         type                    :: atom() | string() | binary(),
         effect                  :: atom() | string() | binary(),
